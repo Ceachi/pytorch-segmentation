@@ -97,3 +97,15 @@ The training script accepts a `gpu` parameter in experiment configs to choose
 which GPU to run on (e.g. `gpu: 1`). Optimizers and schedulers are configured
 via `optimizer` and `scheduler` blocks and are passed through to PyTorch
 accordingly.
+
+### Checkpoints
+
+During training, model weights are periodically written under
+`checkpoints/<run-name>`:
+
+- `ckpt_latest.pth` – weights from the most recent epoch
+- `ckpt_best.pth` – weights achieving the best monitored metric
+- `average_model.pth` – running average of model weights
+
+All three files are also uploaded to the corresponding W&B run and updated as
+training progresses.

@@ -10,6 +10,8 @@ defaults:
   lr: 0.0001
   max_epochs: 1
   gpu: 0
+  monitor: val/mIoU
+  ckpt_dir: checkpoints
   train_transforms:
     - name: resize
       params:
