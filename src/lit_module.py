@@ -3,8 +3,16 @@ from typing import List, Optional
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 import torch
-from segmentation_models_pytorch.losses import DiceLoss
 from torchmetrics.classification import MulticlassF1Score, MulticlassJaccardIndex
+
+from .losses import (
+    BinaryDiceLoss,
+    BinaryIoULoss,
+    DiceLoss,
+    GeneralizedDiceLoss,
+    GeneralizedIoULoss,
+    IoULoss,
+)
 
 
 class SegmentationModel(pl.LightningModule):
@@ -19,6 +27,7 @@ class SegmentationModel(pl.LightningModule):
         scheduler: Optional[dict] = None,
         optimizer: Optional[dict] = None,
         class_names: Optional[List[str]] = None,
+        loss: str = "dice",
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -28,7 +37,17 @@ class SegmentationModel(pl.LightningModule):
             in_channels=in_channels,
             classes=classes,
         )
-        self.loss_fn = DiceLoss(mode="multiclass")
+        loss_map = {
+            "dice": DiceLoss(),
+            "binary_dice": BinaryDiceLoss(),
+            "generalized_dice": GeneralizedDiceLoss(),
+            "iou": IoULoss(),
+            "binary_iou": BinaryIoULoss(),
+            "generalized_iou": GeneralizedIoULoss(),
+        }
+        self.loss_fn = loss_map.get(loss)
+        if self.loss_fn is None:
+            raise ValueError(f"Unsupported loss: {loss}")
         self.scheduler_cfg = scheduler
         self.optimizer_cfg = optimizer
         self.class_names = class_names or [str(i) for i in range(classes)]
@@ -62,7 +81,9 @@ class SegmentationModel(pl.LightningModule):
     def configure_optimizers(self):  # noqa: D401
         opt_cfg = self.optimizer_cfg or {"name": "AdamW", "params": {}}
         opt_cls = getattr(torch.optim, opt_cfg["name"])
-        optimizer = opt_cls(self.parameters(), lr=self.hparams.lr, **opt_cfg.get("params", {}))
+        optimizer = opt_cls(
+            self.parameters(), lr=self.hparams.lr, **opt_cfg.get("params", {})
+        )
 
         if self.scheduler_cfg:
             sched_name = self.scheduler_cfg["name"]
