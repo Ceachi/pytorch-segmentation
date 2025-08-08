@@ -117,7 +117,6 @@ def main():
     monitor_metric = params.get("monitor", "val/mIoU")
     ckpt_dir = Path(params.get("ckpt_dir", "checkpoints")) / run_name
     callbacks.append(CheckpointSaver(dirpath=ckpt_dir, monitor=monitor_metric))
-
     trainer_kwargs = {"max_epochs": params["max_epochs"], "logger": logger, "callbacks": callbacks}
     if params.get("gpu") is not None:
         trainer_kwargs.update({"accelerator": "gpu", "devices": [params["gpu"]]})
