@@ -1,0 +1,9 @@
+torch
+torchvision
+pytorch-lightning
+python-dotenv
+wandb
+albumentations
+pyyaml
+torchmetrics
+opencv-python

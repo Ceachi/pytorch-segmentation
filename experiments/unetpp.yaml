@@ -1,0 +1,49 @@
+model:
+  arch: UnetPlusPlus
+  encoder_name: resnet34
+  encoder_weights: imagenet
+  in_channels: 3
+  classes: 2
+
+defaults:
+  batch_size: 32
+  lr: 0.0001
+  max_epochs: 1
+  gpu: 0
+  train_transforms:
+    - name: resize
+      params:
+        height: 1024
+        width: 1024
+    - name: random_rotate_90
+      params:
+        p: 0.5
+    - name: horizontal_flip
+      params:
+        p: 0.5
+    - name: vertical_flip
+      params:
+        p: 0.5
+  val_transforms:
+    - name: resize
+      params:
+        height: 1024
+        width: 1024
+  optimizer:
+    name: AdamW
+    params:
+      weight_decay: 0.01
+  scheduler:
+    name: CosineAnnealingLR
+    params:
+      T_max: 10
+  early_stopping:
+    monitor: val/mIoU
+    patience: 3
+    mode: max
+
+experiments:
+  experiment-batch_size:
+    batch_size: 8
+  experiment-lr:
+    lr: 0.001
