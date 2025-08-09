@@ -7,3 +7,4 @@ albumentations
 pyyaml
 torchmetrics
 opencv-python
+timm

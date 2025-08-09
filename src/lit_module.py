@@ -3,7 +3,17 @@ from typing import List, Optional
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 import torch
-from torchmetrics.classification import MulticlassF1Score, MulticlassJaccardIndex
+
+try:  # torchmetrics>=0.11 provides task specific metrics
+    from torchmetrics.classification import (
+        MulticlassF1Score as F1Score,
+        MulticlassJaccardIndex as JaccardIndex,
+    )
+    _metric_kwargs = {}
+except ImportError:  # fallback for newer torchmetrics versions
+    from torchmetrics import F1Score, JaccardIndex
+
+    _metric_kwargs = {"task": "multiclass"}
 
 from .losses import (
     BinaryDiceLoss,
@@ -51,10 +61,10 @@ class SegmentationModel(pl.LightningModule):
         self.scheduler_cfg = scheduler
         self.optimizer_cfg = optimizer
         self.class_names = class_names or [str(i) for i in range(classes)]
-        self.train_iou = MulticlassJaccardIndex(num_classes=classes, average="none")
-        self.val_iou = MulticlassJaccardIndex(num_classes=classes, average="none")
-        self.train_dice = MulticlassF1Score(num_classes=classes, average="none")
-        self.val_dice = MulticlassF1Score(num_classes=classes, average="none")
+        self.train_iou = JaccardIndex(num_classes=classes, average="none", **_metric_kwargs)
+        self.val_iou = JaccardIndex(num_classes=classes, average="none", **_metric_kwargs)
+        self.train_dice = F1Score(num_classes=classes, average="none", **_metric_kwargs)
+        self.val_dice = F1Score(num_classes=classes, average="none", **_metric_kwargs)
 
     def forward(self, x):  # noqa: D401
         return self.model(x)

@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.loggers import WandbLogger
 import segmentation_models_pytorch as smp
+import torch
 import wandb
 import yaml
 from dotenv import load_dotenv
@@ -141,8 +142,11 @@ def main():
         "logger": logger,
         "callbacks": callbacks,
     }
-    if params.get("gpu") is not None:
-        trainer_kwargs.update({"accelerator": "gpu", "devices": [params["gpu"]]})
+    gpu_idx = params.get("gpu")
+    if gpu_idx is not None and torch.cuda.is_available():
+        trainer_kwargs.update({"accelerator": "gpu", "devices": [gpu_idx]})
+    elif gpu_idx is not None and not torch.cuda.is_available():
+        print("GPU requested but not available, training on CPU instead")
     trainer = pl.Trainer(**trainer_kwargs)
     trainer.fit(model, datamodule=datamodule)
 
