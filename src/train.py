@@ -11,7 +11,7 @@ import segmentation_models_pytorch as smp
 import torch
 import wandb
 import yaml
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 from .datamodule import SegmentationDataModule
 from .lit_module import SegmentationModel
@@ -38,12 +38,28 @@ def main():
     parser.add_argument("--experiment", type=str, required=True, help="Experiment name")
     args = parser.parse_args()
 
-    load_dotenv()
-    data_dir = os.environ["DATASET_PATH"]
-    wandb_project = os.environ.get("WANDB_PROJECT")
-    class_names = [
-        n.strip() for n in os.environ.get("CLASS_NAMES", "").split(",") if n.strip()
-    ]
+    # load_dotenv()
+    # data_dir = os.environ["DATASET_PATH"]
+    # wandb_project = os.environ.get("WANDB_PROJECT")
+    # class_names = [
+    #     n.strip() for n in os.environ.get("CLASS_NAMES", "").split(",") if n.strip()
+    # ]
+    # Load environment variables from .env if present; fall back to .env.example
+    env_file = find_dotenv(".env", usecwd=True)
+    if not env_file:
+        env_file = find_dotenv(".env.example", usecwd=True)
+    if env_file:
+        load_dotenv(env_file)
+
+    data_dir = os.getenv("DATASET_PATH")
+    if not data_dir:
+        raise RuntimeError(
+            "DATASET_PATH is not set. Create a .env file based on .env.example or "
+            "export the variable in your environment."
+        )
+    wandb_project = os.getenv("WANDB_PROJECT")
+    class_names = [n.strip() for n in os.getenv("CLASS_NAMES", "").split(",") if n.strip()]
+
 
     model_cfg, params = load_experiment(args.config, args.experiment)
     model_cfg.setdefault("classes", len(class_names))

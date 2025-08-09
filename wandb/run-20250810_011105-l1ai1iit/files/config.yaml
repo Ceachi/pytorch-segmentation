@@ -1,0 +1,195 @@
+_wandb:
+    value:
+        cli_version: 0.19.5
+        m:
+            - "1": examples._type
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": trainer/global_step
+              "6":
+                - 3
+              "7": []
+            - "1": examples.width
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": examples.height
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": examples.format
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": examples.count
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": examples.filenames
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": examples.all_masks
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+        mask/class_labels:
+            examples_wandb_delimeter_ground_truth:
+                key: examples_wandb_delimeter_ground_truth
+                type: mask/class_labels
+                value:
+                    "0": background
+                    "1": stroma
+                    "2": adk_invasion
+                    "3": high_grade
+                    "4": low_grade
+                    "5": normal_gland
+        python_version: 3.9.20
+        t:
+            "1":
+                - 1
+                - 5
+                - 9
+                - 11
+                - 41
+                - 49
+                - 53
+                - 55
+                - 63
+                - 71
+                - 74
+                - 80
+                - 103
+            "2":
+                - 1
+                - 5
+                - 9
+                - 11
+                - 41
+                - 49
+                - 53
+                - 55
+                - 63
+                - 71
+                - 74
+                - 80
+                - 103
+            "3":
+                - 7
+                - 13
+                - 16
+                - 23
+                - 55
+                - 66
+            "4": 3.9.20
+            "5": 0.19.5
+            "6": 4.54.1
+            "8":
+                - 5
+            "12": 0.19.5
+            "13": linux-x86_64
+arch:
+    value: UnetPlusPlus
+batch_size:
+    value: 32
+ckpt_dir:
+    value: checkpoints
+class_names:
+    value:
+        - background
+        - stroma
+        - adk_invasion
+        - high_grade
+        - low_grade
+        - normal_gland
+classes:
+    value: 6
+early_stopping:
+    value:
+        mode: max
+        monitor: val/mIoU
+        patience: 3
+encoder_name:
+    value: resnet34
+encoder_weights:
+    value: imagenet
+gpu:
+    value: 0
+in_channels:
+    value: 3
+loss:
+    value: generalized_dice
+lr:
+    value: 0.0001
+max_epochs:
+    value: 200
+monitor:
+    value: val/mIoU
+optimizer:
+    value:
+        name: AdamW
+        params:
+            weight_decay: 0.01
+scheduler:
+    value:
+        name: CosineAnnealingLR
+        params:
+            T_max: 10
+train_transforms:
+    value:
+        - name: resize
+          params:
+            height: 1024
+            width: 1024
+        - name: random_rotate_90
+          params:
+            p: 0.5
+        - name: horizontal_flip
+          params:
+            p: 0.5
+        - name: vertical_flip
+          params:
+            p: 0.5
+        - name: normalize
+          params:
+            max_pixel_value: 1
+            mean:
+                - 0.485
+                - 0.456
+                - 0.406
+            std:
+                - 0.229
+                - 0.224
+                - 0.225
+val_transforms:
+    value:
+        - name: resize
+          params:
+            height: 1024
+            width: 1024
+        - name: normalize
+          params:
+            max_pixel_value: 1
+            mean:
+                - 0.485
+                - 0.456
+                - 0.406
+            std:
+                - 0.229
+                - 0.224
+                - 0.225
